@@ -2,9 +2,9 @@ using Flux
 
 struct WFN
     mol_name::String
-    n_mol_orbitals::Integer
-    n_primitives::Integer
-    n_nuclei::Integer
+    n_mol_orbitals::Int32
+    n_primitives::Int32
+    n_nuclei::Int32
     nuclei_type::AbstractArray
     nuclei_pos::AbstractArray
     nuclei_charge::AbstractArray
@@ -33,11 +33,11 @@ function read_wfn(filepath; device = cpu)
     
     #Get metadata
     n_mol_orbitals = match(r"[0-9]*(?= MOL ORBITALS)", metadata).match |> string
-    n_mol_orbitals = parse(Int64, n_mol_orbitals)
+    n_mol_orbitals = parse(Int32, n_mol_orbitals)
     n_primitives = match(r"[0-9]*(?= PRIMITIVES)", metadata).match |> string
-    n_primitives = parse(Int64, n_primitives)
+    n_primitives = parse(Int32, n_primitives)
     n_nuclei = match(r"[0-9]*(?= NUCLEI)", metadata).match |> string
-    n_nuclei = parse(Int64, n_nuclei)
+    n_nuclei = parse(Int32, n_nuclei)
     
     #Parse nuclei section
     nuclei_parse = [split(n) for n in nuclei_list]
@@ -49,13 +49,13 @@ function read_wfn(filepath; device = cpu)
     c_assignments = match(r"CENTRE ASSIGNMENTS(.*?)(?=\nTYPE)"s, doc)
     c_assignments = replace(c_assignments.match, "CENTRE ASSIGNMENTS"=>"")
     c_assignments = replace(c_assignments, r"\s+"=>" ")
-    center_assignments = [parse(Int64, i) for i in split(c_assignments)]
+    center_assignments = [parse(Int32, i) for i in split(c_assignments)]
     
     #Parse type assignments
     t_assignments = match(r"TYPE ASSIGNMENTS(.*?)(?=\nEXPONENTS)"s, doc)
     t_assignments = replace(t_assignments.match, "TYPE ASSIGNMENTS"=>"")
     t_assignments = replace(t_assignments, r"\s+"=>" ")
-    type_assignments = [parse(Int64, i) for i in split(t_assignments)]
+    type_assignments = [parse(Int32, i) for i in split(t_assignments)]
 
     function parse_exponent(t, s)
         a=parse.(t, split(s,'D'))
@@ -100,9 +100,9 @@ function read_wfn(filepath; device = cpu)
     n_primitives,
     n_nuclei,
     nuclei_type_l,
-    nuclei_pos,
+    nuclei_pos |> device,
     nuclei_charge |> device,
-    center_assignments,
+    center_assignments |> device,
     type_assignments |> device,
     exponents |> device,
     MO |> device,

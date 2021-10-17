@@ -1,7 +1,5 @@
-using Zygote
 using Tullio
 using LinearAlgebra
-using ForwardDiff
 using CUDA, CUDAKernels, KernelAbstractions
 
 function get_gaussian_constant(t::Integer, ΔX::Float32, ΔY::Float32, ΔZ::Float32)::Float32
@@ -150,30 +148,24 @@ function generate_Y_matrix_el(m::Integer,
     0.0
 end
 
-function get_electronic_density(r⃗::AbstractArray, f::WFN, device)::AbstractArray
-    r⃗_μ = f.center_assignments .|> (a -> f.nuclei_pos[a,:]) |> (x -> hcat(x...)) |> transpose |> device
-    @tullio Δr⃗[p,dim,r] := r⃗[r,dim] - r⃗_μ[p,dim]
-    sq_dist = dropdims(sum(Δr⃗.^2, dims=2), dims=2) |> device
-    @tullio c_g[p,r] := get_gaussian_constant(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r])
-    c_g = c_g |> device
+function get_electronic_density(r⃗::AbstractArray, f::WFN)::AbstractArray
+    @tullio r⃗_μ[prim,dim] := f.nuclei_pos[f.center_assignments[prim],dim] grad=false
+    @tullio Δr⃗[p,dim,r] := r⃗[r,dim] - r⃗_μ[p,dim] grad=false
+    sq_dist = dropdims(sum(Δr⃗.^2, dims=2), dims=2)
+    @tullio c_g[p,r] := get_gaussian_constant(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
     Ψ_μ = c_g .* exp.(-f.exponents .* sq_dist)
     Φ_r = f.mo * Ψ_μ
     ρ = transpose(Φ_r.^2) * f.occ_no
 end
 
-function get_sum_squared_gradients(r⃗::AbstractArray, f::WFN, device)::Number
-    r⃗_μ = f.center_assignments .|> (a -> f.nuclei_pos[a,:]) |> (x -> hcat(x...)) |> transpose |> device
-    @tullio Δr⃗[p,dim,r] := r⃗[r,dim] - r⃗_μ[p,dim]
-    sq_dist = dropdims(sum(Δr⃗.^2, dims=2), dims=2) |> device
+function get_sum_squared_gradients(r⃗::AbstractArray, f::WFN)::Number
+    @tullio r⃗_μ[prim,dim] := f.nuclei_pos[f.center_assignments[prim],dim] grad=Dual
+    @tullio Δr⃗[p,dim,r] := r⃗[r,dim] - r⃗_μ[p,dim] grad=Dual
+    sq_dist = dropdims(sum(Δr⃗.^2, dims=2), dims=2)
     @tullio c_g[p,r] := get_gaussian_constant(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=Dual
     @tullio ∂gc∂X[p,r] := get_∂gc∂X(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=Dual
     @tullio ∂gc∂Y[p,r] := get_∂gc∂Y(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=Dual
     @tullio ∂gc∂Z[p,r] := get_∂gc∂Z(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=Dual
-    c_g = c_g |> device
-    ∂gc∂X = ∂gc∂X |> device
-    ∂gc∂Y = ∂gc∂Y |> device
-    ∂gc∂Z = ∂gc∂Z |> device
-    Δr⃗ = Δr⃗ |> device
     F0 = exp.(-f.exponents .* sq_dist)
     ∂F∂X = -2.0*f.exponents .* F0 .* Δr⃗[:,1,:]
     ∂F∂Y = -2.0*f.exponents .* F0 .* Δr⃗[:,2,:]
@@ -194,11 +186,11 @@ function get_sum_squared_gradients(r⃗::AbstractArray, f::WFN, device)::Number
 end
 
 
-function find_points(r⃗, f; iters = 100, η = 0.1, device = cpu)
-    df(x) = Zygote.gradient(r⃗ -> get_sum_squared_gradients(r⃗, f, device), x)
+function find_points(r⃗, f; iters = 100, η = 0.1)
+    df(x) = Zygote.gradient(r⃗ -> get_sum_squared_gradients(r⃗, f), x)
     for iter in 1:iters
-        grad = CUDA.@allowscalar df(r⃗)[1]
+        grad = df(r⃗)[1]
         r⃗ -= η .* grad
     end
-    r⃗, get_electronic_density(r⃗, f, device)
+    r⃗, get_electronic_density(r⃗, f)
 end
