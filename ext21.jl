@@ -148,7 +148,7 @@ function generate_Y_matrix_el(m::Integer,
     0.0
 end
 
-function get_electronic_density(r⃗::AbstractArray, f::WFN)::AbstractArray
+function get_electronic_density(r⃗::AbstractArray, f::AtomicInformationFile)::AbstractArray
     @tullio r⃗_μ[prim,dim] := f.nuclei_pos[f.center_assignments[prim],dim] grad=false
     @tullio Δr⃗[p,dim,r] := r⃗[r,dim] - r⃗_μ[p,dim] grad=false
     sq_dist = dropdims(sum(Δr⃗.^2, dims=2), dims=2)
@@ -158,7 +158,54 @@ function get_electronic_density(r⃗::AbstractArray, f::WFN)::AbstractArray
     ρ = transpose(Φ_r.^2) * f.occ_no
 end
 
-function get_sum_squared_gradients(r⃗::AbstractArray, f::WFN)::Number
+function get_electronic_density_laplacian(r⃗::AbstractArray, f::AtomicInformationFile)::AbstractArray
+    @tullio r⃗_μ[prim,dim] := f.nuclei_pos[f.center_assignments[prim],dim] grad=false
+    @tullio Δr⃗[p,dim,r] := r⃗[r,dim] - r⃗_μ[p,dim] grad=false
+    sq_dist = dropdims(sum(Δr⃗.^2, dims=2), dims=2)
+    @tullio c_g[p,r] := get_gaussian_constant(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
+    
+    @tullio ∂gc∂X[p,r] := get_∂gc∂X(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
+    @tullio ∂gc∂Y[p,r] := get_∂gc∂Y(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
+    @tullio ∂gc∂Z[p,r] := get_∂gc∂Z(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
+
+    @tullio ∂²gc∂X²[p,r] := get_∂²gc∂X²(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
+    @tullio ∂²gc∂Y²[p,r] := get_∂²gc∂Y²(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
+    @tullio ∂²gc∂Z²[p,r] := get_∂²gc∂Z²(f.type_assignments[p], Δr⃗[p,1,r], Δr⃗[p,2,r], Δr⃗[p,3,r]) grad=false
+    
+    F0 = exp.(-f.exponents .* sq_dist)
+    toalp = -2.0 * f.exponents
+    toalpe = toalp .* F0
+    ∂F∂X = toalpe .* Δr⃗[:,1,:]
+    ∂F∂Y = toalpe .* Δr⃗[:,2,:]
+    ∂F∂Z = toalpe .* Δr⃗[:,3,:]
+    ∂²F∂X² = (toalp .* Δr⃗[:,1,:] .* ∂F∂X) + toalpe
+    ∂²F∂Y² = (toalp .* Δr⃗[:,2,:] .* ∂F∂Y) + toalpe
+    ∂²F∂Z² = (toalp .* Δr⃗[:,3,:] .* ∂F∂Z) + toalpe
+    
+    Ψ_μ = c_g .* F0
+    ∂Ψ_μ∂X = ∂gc∂X .* F0 + c_g .* ∂F∂X
+    ∂Ψ_μ∂Y = ∂gc∂Y .* F0 + c_g .* ∂F∂Y
+    ∂Ψ_μ∂Z = ∂gc∂Z .* F0 + c_g .* ∂F∂Z
+    ∂²Ψ_μ∂X² = (∂²gc∂X² .* F0) + (2 * ∂gc∂X .* ∂F∂X) + (c_g .* ∂²F∂X²)
+    ∂²Ψ_μ∂Y² = (∂²gc∂Y² .* F0) + (2 * ∂gc∂Y .* ∂F∂Y) + (c_g .* ∂²F∂Y²)
+    ∂²Ψ_μ∂Z² = (∂²gc∂Z² .* F0) + (2 * ∂gc∂Z .* ∂F∂Z) + (c_g .* ∂²F∂Z²)
+
+    Φ_r = f.mo * Ψ_μ
+    ∂Φ∂X = f.mo * ∂Ψ_μ∂X
+    ∂Φ∂Y = f.mo * ∂Ψ_μ∂Y
+    ∂Φ∂Z = f.mo * ∂Ψ_μ∂Z
+    ∂²Φ∂X² = f.mo * ∂²Ψ_μ∂X²
+    ∂²Φ∂Y² = f.mo * ∂²Ψ_μ∂Y²
+    ∂²Φ∂Z² = f.mo * ∂²Ψ_μ∂Z²
+
+    ∂²ρ∂X² = 2 * (transpose(∂Φ∂X.^2)  + transpose(∂²Φ∂X² .* Φ_r)) * f.occ_no
+    ∂²ρ∂Y² = 2 * (transpose(∂Φ∂Y.^2) + transpose(∂²Φ∂Y² .* Φ_r)) * f.occ_no
+    ∂²ρ∂Z² = 2 * (transpose(∂Φ∂Z.^2) + transpose(∂²Φ∂Z² .* Φ_r)) * f.occ_no
+    
+    ∂²ρ∂X²+∂²ρ∂Y²+∂²ρ∂Z²
+end
+
+function get_sum_squared_gradients(r⃗::AbstractArray, f::AtomicInformationFile)::Number
     @tullio r⃗_μ[prim,dim] := f.nuclei_pos[f.center_assignments[prim],dim] grad=Dual
     @tullio Δr⃗[p,dim,r] := r⃗[r,dim] - r⃗_μ[p,dim] grad=Dual
     sq_dist = dropdims(sum(Δr⃗.^2, dims=2), dims=2)

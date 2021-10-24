@@ -1,0 +1,94 @@
+<Title>
+ optimization
+</Title>
+<Keywords>
+ GTO
+</Keywords>
+<Number of Nuclei>
+ 2
+</Number of Nuclei>
+<Number of Occupied Molecular Orbitals>
+ 1
+</Number of Occupied Molecular Orbitals>
+<Number of Perturbations>
+ 0
+</Number of Perturbations>
+<Net Charge>
+ 0
+</Net Charge>
+<Number of Electrons>
+ 2
+</Number of Electrons>
+<Number of Alpha Electrons>
+ 1
+</Number of Alpha Electrons>
+<Number of Beta Electrons>
+ 1
+</Number of Beta Electrons>
+<Electronic Spin Multiplicity>
+ 1
+</Electronic Spin Multiplicity>
+<Number of Core Electrons>
+ 0
+</Number of Core Electrons>
+<Nuclear Names>
+ H1
+ H2
+</Nuclear Names>
+<Atomic Numbers>
+ 1
+ 1
+</Atomic Numbers>
+<Nuclear Charges>
+  1.000000000000e+00
+  1.000000000000e+00
+</Nuclear Charges>
+<Nuclear Cartesian Coordinates>
+  0.000000000000e+00  0.000000000000e+00  7.104387570780e-01
+  8.700365498458e-17  0.000000000000e+00 -7.104387570780e-01
+</Nuclear Cartesian Coordinates>
+<Number of Primitives>
+ 16
+</Number of Primitives>
+<Primitive Centers>
+                   1                   1                   1                   1                   1
+                   1                   1                   1                   2                   2
+                   2                   2                   2                   2                   2
+                   2
+</Primitive Centers>
+<Primitive Types>
+                   1                   1                   1                   1                   1
+                   2                   3                   4                   1                   1
+                   1                   1                   1                   2                   3
+                   4
+</Primitive Types>
+<Primitive Exponents>
+  3.386500000000e+01  5.094790000000e+00  1.158790000000e+00  3.258400000000e-01  1.027410000000e-01
+  7.500000000000e-01  7.500000000000e-01  7.500000000000e-01  3.386500000000e+01  5.094790000000e+00
+  1.158790000000e+00  3.258400000000e-01  1.027410000000e-01  7.500000000000e-01  7.500000000000e-01
+  7.500000000000e-01
+</Primitive Exponents>
+<Molecular Orbital Occupation Numbers>
+  2.000000000000e+00
+</Molecular Orbital Occupation Numbers>
+<Molecular Orbital Energies>
+ -3.793457875473e-01
+</Molecular Orbital Energies>
+<Molecular Orbital Spin Types>
+ Alpha and Beta
+</Molecular Orbital Spin Types>
+<Molecular Orbital Primitive Coefficients>
+<MO Number>
+ 1
+</MO Number>
+  4.996961828889e-02  9.013806216411e-02  1.328872628116e-01  8.412771500700e-02
+  1.860675638737e-02  0.000000000000e+00  0.000000000000e+00 -1.808955952203e-02
+  4.996961828889e-02  9.013806216411e-02  1.328872628116e-01  8.412771500700e-02
+  1.860675638737e-02  0.000000000000e+00  0.000000000000e+00  1.808955952203e-02
+</Molecular Orbital Primitive Coefficients>
+<Energy = T + Vne + Vee + Vnn>
+ -1.165851905739e+00
+</Energy = T + Vne + Vee + Vnn>
+<Virial Ratio (-V/T)>
+ 2.033896731911e+00
+</Virial Ratio (-V/T)>

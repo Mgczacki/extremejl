@@ -1,7 +1,9 @@
 using Flux
+using LightXML
 
 struct WFN
-    mol_name::String
+    filename::String
+    title::String
     n_mol_orbitals::Int32
     n_primitives::Int32
     n_nuclei::Int32
@@ -15,15 +17,45 @@ struct WFN
     occ_no::AbstractArray
     orb_energy::AbstractArray
     tot_energy::Float32
-    virial::Float32
+    virial_ratio::Float32
 end
+
+struct WFX
+    filename::String
+    title::String
+    keywords::AbstractArray
+    n_mol_orbitals::Int32
+    n_primitives::Int32
+    n_nuclei::Int32
+    n_elec::Int32
+    n_perturbations::Int32
+    n_α_elec::Int32
+    n_β_elec::Int32
+    elec_spin_mult::Int32
+    n_core_elec::Int32
+    nuclear_names::AbstractArray
+    atomic_numbers::AbstractArray
+    nuclei_pos::AbstractArray
+    nuclei_charge::AbstractArray
+    center_assignments::AbstractArray
+    type_assignments::AbstractArray
+    exponents::AbstractArray
+    mo::AbstractArray
+    mo_spin_types::AbstractArray
+    occ_no::AbstractArray
+    orb_energy::AbstractArray
+    tot_energy::Float32
+    virial_ratio::Float32
+end
+
+AtomicInformationFile = Union{WFN,WFX}
 
 function read_wfn(filepath; device = cpu)
     io = open(filepath, "r");
     doc = read(io, String)
     close(io)
     
-    #Filename
+    #title
     name = match(r"(?<=\s)(.*?)(?=\n)"s, doc).match
     
     #Parse centers section
@@ -78,9 +110,9 @@ function read_wfn(filepath; device = cpu)
         [parse_exponent(Float32, i) for i in split(a)]
     end
     
-    MO = zeros(n_mol_orbitals, n_primitives)
-    OCC_NO = zeros(n_mol_orbitals)
-    ORB_ENERGY = zeros(n_mol_orbitals)
+    MO = zeros(Float32, n_mol_orbitals, n_primitives)
+    OCC_NO = zeros(Float32, n_mol_orbitals)
+    ORB_ENERGY = zeros(Float32, n_mol_orbitals)
     
     for i in 1:n_mol_orbitals
         header = split(split(MO_matches[i].match, "\n")[1])
@@ -95,7 +127,9 @@ function read_wfn(filepath; device = cpu)
     t_e = parse(Float32, last_line[4])
     virial = parse(Float32, last_line[7])
     
-    WFN(name,
+    WFN(
+    filepath,
+    name,
     n_mol_orbitals,
     n_primitives,
     n_nuclei,
@@ -110,4 +144,87 @@ function read_wfn(filepath; device = cpu)
     ORB_ENERGY,
     t_e,
     virial)
+end
+
+function read_wfx(filepath; device = cpu)
+    io = open(filepath, "r");
+    doc = read(io, String)
+    close(io)
+    doc = replace(doc, "Virial Ratio (-V/T)"=>"Virial Ratio")
+    doc = sprint(sizehint=sizeof(doc)) do io
+	    in_tag = false
+	    invalid = [' ', '=', '+']
+	    for c in doc
+		if c == '<'
+		    in_tag = true
+		elseif c == '>'
+		    in_tag = false
+		end
+		
+		write(io, in_tag && c in invalid ? '_' : c)
+	    end
+	end
+    xdoc = parse_string("<root>"*doc*"</root>")
+    
+    title = split(content(find_element(root(xdoc), "Title")))[1]
+    keywords = split(content(find_element(root(xdoc), "Keywords"))) .|> String
+    num_nuc = split(content(find_element(root(xdoc), "Number_of_Nuclei")))[1] |> x -> parse(Int32, x)
+    num_mo = split(content(find_element(root(xdoc), "Number_of_Occupied_Molecular_Orbitals")))[1] |> x -> parse(Int32, x)
+    num_pert = split(content(find_element(root(xdoc), "Number_of_Perturbations")))[1] |> x -> parse(Int32, x)
+    num_elec = split(content(find_element(root(xdoc), "Number_of_Electrons")))[1] |> x -> parse(Int32, x)
+    num_α_elec = split(content(find_element(root(xdoc), "Number_of_Alpha_Electrons")))[1] |> x -> parse(Int32, x)
+    num_β_elec = split(content(find_element(root(xdoc), "Number_of_Beta_Electrons")))[1] |> x -> parse(Int32, x)
+    elec_spin_mult = split(content(find_element(root(xdoc), "Electronic_Spin_Multiplicity")))[1] |> x -> parse(Int32, x)
+    num_core_elec = split(content(find_element(root(xdoc), "Number_of_Core_Electrons")))[1] |> x -> parse(Int32, x)
+    nuclear_names = split(content(find_element(root(xdoc), "Nuclear_Names"))) .|> String
+    atomic_numbers = split(content(find_element(root(xdoc), "Atomic_Numbers"))) .|> x -> parse(Int32, x)
+    nuclear_charges = split(content(find_element(root(xdoc), "Nuclear_Charges"))) .|> x -> parse(Float32, x)
+    nuclear_coordinates = split(content(find_element(root(xdoc), "Nuclear_Cartesian_Coordinates"))) .|> x -> parse(Float32, x)
+    nuclear_coordinates = permutedims(reshape(nuclear_coordinates, (3,:)), (2,1))
+    num_primitives = split(content(find_element(root(xdoc), "Number_of_Primitives")))[1] |> x -> parse(Int32, x)
+    primitive_centers = split(content(find_element(root(xdoc), "Primitive_Centers"))) .|> x -> parse(Int32, x)
+    primitive_types = split(content(find_element(root(xdoc), "Primitive_Types"))) .|> x -> parse(Int32, x)
+    primitive_exponents = split(content(find_element(root(xdoc), "Primitive_Exponents"))) .|> x -> parse(Float32, x)
+    mo_occ_numbers = split(content(find_element(root(xdoc), "Molecular_Orbital_Occupation_Numbers"))) .|> x -> parse(Float32, x)
+    mo_energies = split(content(find_element(root(xdoc), "Molecular_Orbital_Energies"))) .|> x -> parse(Float32, x)
+    mo_spin_types = split(content(find_element(root(xdoc), "Molecular_Orbital_Spin_Types")))
+    energy = split(content(find_element(root(xdoc), "Energy___T___Vne___Vee___Vnn")))[1] |> x -> parse(Float32, x)
+    virial_ratio = split(content(find_element(root(xdoc), "Virial_Ratio")))[1] |> x -> parse(Float32, x)
+
+    mo_l = find_element(root(xdoc), "Molecular_Orbital_Primitive_Coefficients")
+    MOs = split(content(mo_l), "\n\n", keepempty=false)
+    MO_matrix = zeros(Float32, num_mo ,num_primitives)
+
+    for (idx,val) in enumerate(MOs)
+       if idx %2 == 0
+           MO_matrix[Integer(idx/2),:] = (split(val) .|> x -> parse(Float32, x))
+        end
+    end
+    
+    WFX(filepath,
+    title,
+    keywords,
+    num_mo,
+    num_primitives,
+    num_nuc,
+    num_elec,
+    num_pert,
+    num_α_elec,
+    num_β_elec,
+    elec_spin_mult,
+    num_core_elec,
+    nuclear_names,
+    atomic_numbers,
+    nuclear_coordinates |> device,
+    nuclear_charges |> device,
+    primitive_centers |> device,
+    primitive_types |> device,
+    primitive_exponents |> device,
+    MO_matrix |> device,
+    mo_spin_types,
+    mo_occ_numbers |> device,
+    mo_energies,
+    energy,
+    virial_ratio
+    )
 end
