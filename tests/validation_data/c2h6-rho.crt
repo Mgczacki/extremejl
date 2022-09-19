@@ -1,0 +1,79 @@
+ xx                                                                             
+ ENTER THE TITLE OF THIS RUN 
+ WHICH SCALAR FIELD TO ANALYZE:  
+ ELECTRON DENSITY, RHO (1)
+ LAPLACIAN OF RHO, DEL**2(RHO) (2)
+ LAGRANGIAN KINETIC ENERGY DENSITY, G (3)
+ HAMILTONIAN KINETIC ENERGY DENSITY, K (4)
+ NUCLEAR POTENTIAL, Vnuc (5)
+ POTENTIAL ENERGY DENSITY, V (6)
+ Enter (1-6):  
+ ANALYZING RHO, THE ELECTRON DENSITY
+
+
+ COORDS or NUCLEAR (0), BOND (1), RING (2), CAGE (3), ANGLE (4), POINT (5),
+ MEGA (6), OPTIONS (7), LIST CURRENT CPs (8), STOP (9)
+ Enter (1-9)  
+ Using Avg of Corresponding Nuclear Coordinates as Initial Guess,
+ Search:  For Nuclear Critical Points (1); Between Atom Pairs (2);
+ Between Atom Triads (3); Between Atom Quads (4); All of the Above (5);
+ or None of the Above (0) ? 
+ NEW CRITICAL POINT FOUND:  NUMBER    1
+
+ NEW CRITICAL POINT FOUND:  NUMBER    2
+
+ NEW CRITICAL POINT FOUND:  NUMBER    3
+
+ NEW CRITICAL POINT FOUND:  NUMBER    4
+
+ NEW CRITICAL POINT FOUND:  NUMBER    5
+
+ NEW CRITICAL POINT FOUND:  NUMBER    6
+
+ NEW CRITICAL POINT FOUND:  NUMBER    7
+
+ NEW CRITICAL POINT FOUND:  NUMBER    8
+
+ NEW CRITICAL POINT FOUND:  NUMBER    9
+
+ NEW CRITICAL POINT FOUND:  NUMBER   10
+
+ NEW CRITICAL POINT FOUND:  NUMBER   11
+
+ NEW CRITICAL POINT FOUND:  NUMBER   12
+
+ NEW CRITICAL POINT FOUND:  NUMBER   13
+
+ NEW CRITICAL POINT FOUND:  NUMBER   14
+
+ NEW CRITICAL POINT FOUND:  NUMBER   15
+
+ Search Along Whole Line Between Two Atoms (1)
+ Search Another Line (2)
+ None (0)
+ Enter (0-2)  
+ Search Over one or all atom-centered spheres ? (1=yes/0=no) 
+ What Atom Number ?  Type 0 for all atoms 
+ Input Spherical Grid Search Parameters: 
+ NPhi,NTheta,RadMin,RadMax and NradPt (eg. 6 6 0.5 2.0 10) 
+
+ Search Over one or all atom-centered spheres ? (1=yes/0=no) 
+ COORDS or NUCLEAR (0), BOND (1), RING (2), CAGE (3), ANGLE (4), POINT (5),
+ MEGA (6), OPTIONS (7), LIST CURRENT CPs (8), STOP (9)
+ Enter (1-9)  
+ CRITICAL POINTS: 
+   1   1.41808046E-01  2.79040400E+00  3.38642414E-03  C    1          (3,-3)
+   2   7.95231223E-01  8.38321094E-01 -5.34268004E-02  H    2          (3,-3)
+   3   7.97833112E-01  3.71541727E+00 -1.71556629E+00  H    3          (3,-3)
+   4  -1.91644227E+00  2.75853631E+00 -5.49984227E-02  H    4          (3,-3)
+   5   1.10911914E+00  4.15835288E+00  2.37276444E+00  C    5          (3,-3)
+   6   3.16736893E+00  4.18972199E+00  2.43143736E+00  H    6          (3,-3)
+   7   4.56166401E-01  6.11060155E+00  2.42928990E+00  H    7          (3,-3)
+   8   4.52624168E-01  3.23367246E+00  4.09171685E+00  H    8          (3,-3)
+   9   5.60283249E-01  1.54716646E+00 -2.89958964E-02  H    2  C    1  (3,-1)
+  10   5.61943992E-01  3.38281301E+00 -1.08947536E+00  H    3  C    1  (3,-1)
+  11  -1.16981997E+00  2.77230379E+00 -2.99990306E-02  H    4  C    1  (3,-1)
+  12   6.25463595E-01  3.47437844E+00  1.18807543E+00  C    5  C    1  (3,-1)
+  13   2.42074683E+00  4.17613568E+00  2.40633329E+00  H    6  C    5  (3,-1)
+  14   6.90943432E-01  5.40169595E+00  2.40496356E+00  H    7  C    5  (3,-1)
+  15   6.88684039E-01  3.56615577E+00  3.46562602E+00  H    8  C    5  (3,-1)

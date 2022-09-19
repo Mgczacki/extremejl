@@ -1,0 +1,55 @@
+ xx                                                                             
+ ENTER THE TITLE OF THIS RUN 
+ WHICH SCALAR FIELD TO ANALYZE:  
+ ELECTRON DENSITY, RHO (1)
+ LAPLACIAN OF RHO, DEL**2(RHO) (2)
+ LAGRANGIAN KINETIC ENERGY DENSITY, G (3)
+ HAMILTONIAN KINETIC ENERGY DENSITY, K (4)
+ NUCLEAR POTENTIAL, Vnuc (5)
+ POTENTIAL ENERGY DENSITY, V (6)
+ Enter (1-6):  
+ ANALYZING RHO, THE ELECTRON DENSITY
+
+
+ COORDS or NUCLEAR (0), BOND (1), RING (2), CAGE (3), ANGLE (4), POINT (5),
+ MEGA (6), OPTIONS (7), LIST CURRENT CPs (8), STOP (9)
+ Enter (1-9)  
+ Using Avg of Corresponding Nuclear Coordinates as Initial Guess,
+ Search:  For Nuclear Critical Points (1); Between Atom Pairs (2);
+ Between Atom Triads (3); Between Atom Quads (4); All of the Above (5);
+ or None of the Above (0) ? 
+ NEW CRITICAL POINT FOUND:  NUMBER    1
+
+ NEW CRITICAL POINT FOUND:  NUMBER    2
+
+ NEW CRITICAL POINT FOUND:  NUMBER    3
+
+ NEW CRITICAL POINT FOUND:  NUMBER    4
+
+ NEW CRITICAL POINT FOUND:  NUMBER    5
+
+ NEW CRITICAL POINT FOUND:  NUMBER    6
+
+ NEW CRITICAL POINT FOUND:  NUMBER    7
+
+ Search Along Whole Line Between Two Atoms (1)
+ Search Another Line (2)
+ None (0)
+ Enter (0-2)  
+ Search Over one or all atom-centered spheres ? (1=yes/0=no) 
+ What Atom Number ?  Type 0 for all atoms 
+ Input Spherical Grid Search Parameters: 
+ NPhi,NTheta,RadMin,RadMax and NradPt (eg. 6 6 0.5 2.0 10) 
+
+ Search Over one or all atom-centered spheres ? (1=yes/0=no) 
+ COORDS or NUCLEAR (0), BOND (1), RING (2), CAGE (3), ANGLE (4), POINT (5),
+ MEGA (6), OPTIONS (7), LIST CURRENT CPs (8), STOP (9)
+ Enter (1-9)  
+ CRITICAL POINTS: 
+   1  -1.69851655E+00  7.77551288E-01  2.89957254E-01  O    1          (3,-3)
+   2  -2.15959827E+00  2.47355411E+00 -2.83055501E-01  H    2          (3,-3)
+   3   1.18383630E+00  1.04898942E+00  1.14082667E-01  O    3          (3,-3)
+   4   1.64492012E+00 -1.67012040E-01  1.42789877E+00  H    4          (3,-3)
+   5  -2.05183360E+00  2.08904623E+00 -1.53105201E-01  H    2  O    1  (3,-1)
+   6  -2.57340124E-01  9.11911958E-01  1.99923687E-01  O    3  O    1  (3,-1)
+   7   1.53715483E+00  1.08709638E-01  1.13005420E+00  H    4  O    3  (3,-1)

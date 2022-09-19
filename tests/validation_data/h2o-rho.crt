@@ -1,0 +1,49 @@
+ xx                                                                             
+ ENTER THE TITLE OF THIS RUN 
+ WHICH SCALAR FIELD TO ANALYZE:  
+ ELECTRON DENSITY, RHO (1)
+ LAPLACIAN OF RHO, DEL**2(RHO) (2)
+ LAGRANGIAN KINETIC ENERGY DENSITY, G (3)
+ HAMILTONIAN KINETIC ENERGY DENSITY, K (4)
+ NUCLEAR POTENTIAL, Vnuc (5)
+ POTENTIAL ENERGY DENSITY, V (6)
+ Enter (1-6):  
+ ANALYZING RHO, THE ELECTRON DENSITY
+
+
+ COORDS or NUCLEAR (0), BOND (1), RING (2), CAGE (3), ANGLE (4), POINT (5),
+ MEGA (6), OPTIONS (7), LIST CURRENT CPs (8), STOP (9)
+ Enter (1-9)  
+ Using Avg of Corresponding Nuclear Coordinates as Initial Guess,
+ Search:  For Nuclear Critical Points (1); Between Atom Pairs (2);
+ Between Atom Triads (3); Between Atom Quads (4); All of the Above (5);
+ or None of the Above (0) ? 
+ NEW CRITICAL POINT FOUND:  NUMBER    1
+
+ NEW CRITICAL POINT FOUND:  NUMBER    2
+
+ NEW CRITICAL POINT FOUND:  NUMBER    3
+
+ NEW CRITICAL POINT FOUND:  NUMBER    4
+
+ NEW CRITICAL POINT FOUND:  NUMBER    5
+
+ Search Along Whole Line Between Two Atoms (1)
+ Search Another Line (2)
+ None (0)
+ Enter (0-2)  
+ Search Over one or all atom-centered spheres ? (1=yes/0=no) 
+ What Atom Number ?  Type 0 for all atoms 
+ Input Spherical Grid Search Parameters: 
+ NPhi,NTheta,RadMin,RadMax and NradPt (eg. 6 6 0.5 2.0 10) 
+
+ Search Over one or all atom-centered spheres ? (1=yes/0=no) 
+ COORDS or NUCLEAR (0), BOND (1), RING (2), CAGE (3), ANGLE (4), POINT (5),
+ MEGA (6), OPTIONS (7), LIST CURRENT CPs (8), STOP (9)
+ Enter (1-9)  
+ CRITICAL POINTS: 
+   1  -1.51841041E+00  7.62771107E-01  9.46061866E-20  O    1          (3,-3)
+   2   3.11267235E-01  7.75034699E-01 -2.18467861E-18  H    2          (3,-3)
+   3  -2.11760947E+00  2.49159517E+00  7.03836102E-18  H    3          (3,-3)
+   4  -1.06792815E-01  7.77064434E-01 -2.14258082E-17  H    2  O    1  (3,-1)
+   5  -1.97614475E+00  2.09819179E+00  7.97336094E-17  H    3  O    1  (3,-1)
