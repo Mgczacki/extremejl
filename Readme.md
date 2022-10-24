@@ -12,10 +12,9 @@ Currently the project has the necessary functionality in order to:
 - Create plots/animations of electronic densities and their laplacians.
 
 Install:
-1. Clone the repository.
-2. Open Julia
-3. `using Pkg`
-4. `Pkg.add(url="https://github.com/Mgczacki/ext94_refactor")`
+1. Open Julia
+2. `using Pkg`
+3. `Pkg.add(url="https://github.com/Mgczacki/ext94_refactor")`
 
 For usage, see the Jupyter notebooks in the examples folder.
 
