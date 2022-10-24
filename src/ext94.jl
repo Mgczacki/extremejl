@@ -1,5 +1,7 @@
 module ext94
 
+#For gpu and cpu support
+using Flux
 include("wfn.jl")
 include("calculations.jl")
 
