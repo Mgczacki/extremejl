@@ -1,10 +1,22 @@
-# Extreme 94 refactor
+# Extreme 94 refactor - Julia
 
-Este repositorio contiene el código asociado a una refactorización del código para realizar cálculos sobre las densidades electrónicas de moléculas. El código original en Fortran corresponde al programa Ext94, parte del suite de software AIMPAC que aplica la teoría cuántica de átomos en moléculas de Richard Bader.
+This repository contains the code associated with the refactor of the ext94 component for the [AIMPAC](https://www.chemistry.mcmaster.ca/aimpac/imagemap/imagemap.htm) suite of software applications. This was created by reverse-engineering the original Fortran code and porting it to Julia in order to harness its support for parallelism, GPU compute, and extensibility.
 
-En estos momentos, el repositorio presenta el código necesario para:
-- Leer archivos WFX y WFN.
-- Calcular las densidades electrónicas y sus laplacianas, en cualquier punto del espacio tridimensional.
-- Encontrar puntos críticos para la densidad electrónica de las moléculas.
+The future aim of this program is to generate a flexible and scalable library for molecule topological analysis following Richard Bader's Quantum Theory of Atoms in Molecules.
 
-**Investigación realizada gracias al programa UNAM-PAPIIT IA-104720.**
+Currently the project has the necessary functionality in order to:
+
+- Read WFN and WFX files.
+- Calculate electronic densities and their laplacians, for n points in 3D space.
+- Find criticial points in the electronic densitiy of molecules.
+- Create plots/animations of electronic densities and their laplacians.
+
+Install:
+1. Clone the repository.
+2. Open Julia
+3. `using Pkg`
+4. `Pkg.add(path="<Download path>/ext94")`
+
+For usage, see the Jupyter notebooks in the examples folder.
+
+**This project was possible thanks to the program UNAM-PAPIIT IA-104720 / Investigación realizada gracias al programa UNAM-PAPIIT IA-104720.**

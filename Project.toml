@@ -1,0 +1,14 @@
+name = "ext94"
+uuid = "b48b016c-b71d-4718-8455-2160eae1f9f4"
+authors = ["mario_gc <mg@czacki.com>"]
+version = "0.1.0"
+
+[deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+CUDAKernels = "72cfdca4-0801-4ab0-bf6a-d52aa10adc57"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+LightXML = "9c8b4983-aa76-5018-a973-4c85ecc9e179"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
