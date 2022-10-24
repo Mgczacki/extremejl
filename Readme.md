@@ -15,7 +15,7 @@ Install:
 1. Clone the repository.
 2. Open Julia
 3. `using Pkg`
-4. `Pkg.add(path="<Download path>/ext94")`
+4. `Pkg.add(url="https://github.com/Mgczacki/ext94_refactor")`
 
 For usage, see the Jupyter notebooks in the examples folder.
 
