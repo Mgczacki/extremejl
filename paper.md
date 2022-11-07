@@ -1,5 +1,5 @@
 ---
-title: 'SoftwareName: A Julia package for Interacting Quantum Atoms'
+title: 'SoftwareName: A Julia package for Interacting Quantum Atoms Exploration' 
 tags:
   - Julia
   - Quantum Chemical Topology 
@@ -32,7 +32,7 @@ bibliography: paper.bib
 ---
 
 # Summary
-`SoftwareName` is a *Quantum Chemical Topology* (QCT) package which computes *critical bound points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$ and determine the stable manifolds of the  BCP of a molecule. Julia programming language[^1] helps to address the main bottleneck for exploting  *Interacting Quantum Atoms* (IQA) energy partition through calculation of the several integrals in parallel using CUDA.jl package[^2]. `SoftwareName` was created by reverse-engineering the original Fortran code and porting it to Julia in order to harness its support for parallelism, GPU compute, and extensibility.
+`SoftwareName` is a *Quantum Chemical Topology* (QCT) package which computes *critical bound points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$ and determine the stable manifolds of the  BCP of a molecule. Julia programming language[^1] helps to address the main bottleneck for exploring  *Interacting Quantum Atoms* (IQA) energy partition through calculation of the several integrals in parallel using CUDA.jl package[^2]. `SoftwareName` was created by reverse-engineering the original Fortran code and porting it to Julia in order to harness its support for parallelism, GPU compute, and extensibility.
 
 [^1]: https://julialang.org
 [^2]: https://github.com/JuliaGPU/CUDA.jl
@@ -106,23 +106,17 @@ V_{\mathrm{ee}}^{\Omega_{\mathrm{A}}\Omega_{\mathrm{B}}} & =
 
 \noindent The function $\varrho_1(\mathbf{r}_{1};\mathbf{r}_{1}^{\prime})$ is the first-order reduced density matrix and $\delta_{\mathrm{AB}}$ is the Kronecker delta. The terms in equations (\ref{e_neta}) and (\ref{e_inter}) are easily interpretable. The quantity $T^{\Omega_{\mathrm{A}}}$ is the kinetic energy due to basin $\Omega_{\mathrm{A}}$ and $V_{\mathrm{e\tau}}^{\Omega_{\mathrm{A}}\Omega_{\mathrm{B}}}$ is the contribution to the potential energy due to (i) the electrons in basin $\Omega_{\mathrm{A}}$ and (ii) $\tau$, either electrons $\tau =\mathrm{e}$ or the nucleus $\tau = \mathrm{n}$, in basin $\Omega_{\mathrm{B}}$. Indeed, the Coulombic nature of the electronic Hamiltonian and the QTAIM partition, allows the electronic energy to be divided as put forward in equation (\ref{div_iqa}). 
 
-The IQA partition has been very useful in the investigation of a wide diversity of interactions in chemistry, e.g., covalent, polar, ionic, intermolecular interactions as well as chemical bonding in solid state systems. Despite the recognised utility of the IQA analysis, formulae (\ref{cinetica})--(\ref{omega}) imply that the IQA approach requires the integration of scalar fields over very irregular volume shapes. In particular expression (\ref{e_e}) entails the six-dimensional integral over two QTAIM-basins. This endeavour is far from straightforward and it involves a computational effort which severely hampers the applicability of IQA for the study of electronic systems. Currently, the IQA can only be applied to systems with only a few tens of atoms. Indeed, the main bottleneck for the explotaition of the IQA approach is the calculation of the above mentioned integrals. Therefore new algorithms and software is needed for the amelioration of this situation. More specifically, one must determine the QTAIM-basins prior to perform the integrals involved in equations(\ref{cinetica})--(\ref{e_e}). One way to do it is via the determination of the IAS of the whole system. For this purpose, one must first find all the critical points of $\varrho(\mathbf{r})$ and second determine the stable manifolds of the BCP of the molecule or molecular critical under investigation. Therefore new algorithms and software is needed for the amelioration of this situation.
+The IQA partition has been very useful in the investigation of a wide diversity of interactions in chemistry, e.g., covalent, polar, ionic, intermolecular interactions as well as chemical bonding in solid state systems. Despite the recognised utility of the IQA analysis, formulae (\ref{cinetica})--(\ref{omega}) imply that the IQA approach requires the integration of scalar fields over very irregular volume shapes. In particular expression (\ref{e_e}) entails the six-dimensional integral over two QTAIM-basins. This endeavour is far from straightforward and it involves a computational effort which severely hampers the applicability of IQA for the study of electronic systems. Currently, the IQA can only be applied to systems with only a few tens of atoms. Indeed, the main bottleneck for the explotaition of the IQA approach is the calculation of the above mentioned integrals. Therefore new algorithms and software is needed for the amelioration of this situation. Such enhacement comprises the main contribution of this development.
+
+More specifically, one must determine the QTAIM-basins prior to perform the integrals involved in equations(\ref{cinetica})--(\ref{e_e}). One way to do it is via the determination of the IAS of the whole system. For this purpose, one must first find all the critical points of $\varrho(\mathbf{r})$ and second determine the stable manifolds of the BCP of the molecule or molecular critical under investigation. Therefore new algorithms and software is needed for the amelioration of this situation. We herein report a software which performs both tasks and that afterwards can be expanded for the computation of the integrals in formulae (\ref{cinetica})--(\ref{e_e}).
 
 
 # High Performance and Expresiveness for Numerical Computations
 
-In a short period of time the programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: ease of use as a dynamic language with powerful features that make it very productive for writing code, and at the same time, the developed code runs fast, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in index notation.
+In a short period of time Julia programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: ease of use as a dynamic language with powerful features that make it very productive for writing code, and at the same time, the developed code runs fast, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support parallel compututing and NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in index notation.
 
 [^3]: https://github.com/JuliaGPU/KernelAbstractions.jl
 [^4]: https://github.com/mcabbott/Tullio.jl
  
 
-
-We herein report a software which performs both tasks and that afterwards can be expanded for the computation of the integrals in formulae (\ref{cinetica})--(\ref{e_e})
-Such enhacement comprises the main contribution of this paper.
-
 # References
-
-
-
-
