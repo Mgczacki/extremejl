@@ -16,6 +16,12 @@ Install:
 2. `using Pkg`
 3. `Pkg.add(url="https://github.com/Mgczacki/extremejl")`
 
+Test:
+1. Clone this repository and navigate to the root folder.
+2. Open Julia
+3. `]activate .`
+4. `]test`
+
 For usage, see the Jupyter notebooks in the examples folder.
 
 **This project was possible thanks to the program UNAM-PAPIIT IA-104720 / Investigación realizada gracias al programa UNAM-PAPIIT IA-104720.**
