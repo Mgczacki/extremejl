@@ -1,5 +1,5 @@
 ---
-title: 'SoftwareName: A Julia package for Interacting Quantum Atoms Exploration' 
+title: 'Extreme.jl: A Julia package for Interacting Quantum Atoms Exploration' 
 tags:
   - Julia
   - Quantum Chemical Topology 
@@ -32,7 +32,7 @@ bibliography: paper.bib
 ---
 
 # Summary
-`SoftwareName` is a *Quantum Chemical Topology* (QCT) package which computes *critical bound points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$ and determine the stable manifolds of the  BCP of a molecule. Julia programming language[^1] helps to address the main bottleneck for exploring  *Interacting Quantum Atoms* (IQA) energy partition through calculation of the several integrals in parallel using CUDA.jl package[^2]. `SoftwareName` was created by reverse-engineering the original Fortran code and porting it to Julia in order to harness its support for parallelism, GPU compute, and extensibility.
+`Extreme.jl` is a *Quantum Chemical Topology* (QCT) package which computes *critical bound points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$ and determine the stable manifolds of the  BCP of a molecule. Julia programming language[^1] helps to address the main bottleneck for exploring  *Interacting Quantum Atoms* (IQA) energy partition through calculation of the several integrals in parallel using CUDA.jl package[^2]. `Extreme.jl` was created by reverse-engineering the original Fortran code and porting it to Julia in order to harness its support for parallelism, GPU compute, and extensibility.
 
 [^1]: https://julialang.org
 [^2]: https://github.com/JuliaGPU/CUDA.jl
@@ -113,7 +113,7 @@ More specifically, one must determine the QTAIM-basins prior to perform the inte
 
 # High Performance and Expresiveness for Numerical Computations
 
-In a short period of time Julia programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: ease of use as a dynamic language with powerful features that make it very productive for writing code, and at the same time, the developed code runs fast, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support parallel compututing and NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in index notation.
+In a short period of time, the Julia programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: ease of use as a dynamic language with powerful features that make it very productive for writing code, and at the same time, the developed code runs fast, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support parallel compututing and NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in index notation.
 
 [^3]: https://github.com/JuliaGPU/KernelAbstractions.jl
 [^4]: https://github.com/mcabbott/Tullio.jl

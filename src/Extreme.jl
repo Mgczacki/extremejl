@@ -1,4 +1,4 @@
-module extreme
+module Extreme
 
 #For gpu and cpu support
 using Flux
