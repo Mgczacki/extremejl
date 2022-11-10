@@ -1,4 +1,4 @@
-module ext94
+module extreme
 
 #For gpu and cpu support
 using Flux
