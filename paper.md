@@ -32,7 +32,7 @@ bibliography: paper.bib
 ---
 
 # Summary
-`Extreme.jl` is a *Quantum Chemical Topology* (QCT) package which computes *critical bound points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$ and determine the stable manifolds of the  BCP of a molecule. Julia programming language[^1] helps to address the main bottleneck for exploring  *Interacting Quantum Atoms* (IQA) energy partition through calculation of the several integrals in parallel using CUDA.jl package[^2]. `Extreme.jl` was created by reverse-engineering the original Fortran code and porting it to Julia in order to harness its support for parallelism, GPU compute, and extensibility.
+`Extreme.jl` is a *Quantum Chemical Topology* (QCT) package which computes *critical bound points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$ and determines the stable manifolds of the  BCP of a molecule. The Julia programming language[^1] helps to address the main bottleneck for exploring  *Interacting Quantum Atoms* (IQA) energy partitions through calculation of the several integrals in parallel using the CUDA.jl package[^2]. `Extreme.jl` was created by reverse-engineering the original Fortran code and porting it to Julia in order to harness its support for parallelism, GPU compute, and extensibility.
 
 [^1]: https://julialang.org
 [^2]: https://github.com/JuliaGPU/CUDA.jl
@@ -113,10 +113,52 @@ More specifically, one must determine the QTAIM-basins prior to perform the inte
 
 # High Performance and Expresiveness for Numerical Computations
 
-In a short period of time, the Julia programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: ease of use as a dynamic language with powerful features that make it very productive for writing code, and at the same time, the developed code runs fast, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support parallel compututing and NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in index notation.
+In a short period of time, the Julia programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: its ease of use as a dynamic language with powerful features that make it very productive for writing code, and its fast execution speed, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support parallel compututing and NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in index notation.
 
 [^3]: https://github.com/JuliaGPU/KernelAbstractions.jl
 [^4]: https://github.com/mcabbott/Tullio.jl
  
+# The Extreme.jl Julia package
+
+Here we present `Extreme.jl`, a highly-performant Julia package developed with the aim of analyzing the Quantum Chemical Topology of molecules. In its current state, its main functionality is finding critical points in the electron charge distribution of any given molecule. The usual workflow with `Extreme.jl` looks as follows:
+
+1. Load a molecule file (WFN or WFX format).
+2. Select $n$ starting initialization points for critical point search.
+3. Run the critical point finding algorithm.
+
+There are other analysis tools baked into the package such as functions for finding the electron density and its laplacian for any given points in 3D space.
+
+# Single critical point finding benchmarks
+
+Benchmarks were performed on a PC with an i7-5820k and an Nvidia GTX 1080 GPU. For `Extreme.jl`, running times were measured as the average of 3 runs using BenchmarkTools.jl[^5], while ext94 running times were measured using GNU time. For the tests, Julia version 1.6.3 was used, and all runs were measured after an initial first run. This first run is usually far slower due to Julia's JIT compiler.
+
+Each test was performed over a different WFX file, containing the topological information associated with a different molecule. These were selected based on an increasing number of atoms, electrons, and desired critical points.
+
+[TABLE HERE]
+
+[^5]: https://github.com/JuliaCI/BenchmarkTools.jl
+
+# Parallelizing Quantum Chemical Topolical Analysis
+
+`Extreme.jl` was created by reverse engineering the ext94 (extreme) tool of the AIMPAC suite of software applications[^6]. In particular, we explored the source code for its critical-point finding routine. In its original form, the algorithm uses a Newton-Raphson optimization routine over the electron density space for a single point. This involves the usage of nested loop structures which correspond to inner products of vectors and matrix multiplications. The parallelization of these routines is well-known and handled by any given BLAS library, and we decided to use Tullio.jl because of its many advantages:
+
+- It allows for the usage of Einstein notation in order to define multidimensional structures. This gives the code expressiveness, brevity, and an implementation that is remarkably close to the pure mathematical form of the underlying equations.
+- Tullio.jl builds upon the KernelAbstractions.jl[^7] package, which allows for a transparent translation of higher-level expressions into the underlying operations of multiple different compute architectures. This allowed us to use the same source code in order to generate parallel CPU or GPU bound operations.
+- Through KernelAbstractions.jl, it supports mapping arbitrary Julia functions over subsets of a multidimensional data structure. With this, we can create complex functionality for any of the supported architectures. Crucially, it allows us to replace writing CUDA kernels for GPU processing.
+- KernelAbstractions.jl handles parsing expressions, ordering and subdividing computations, and executing operations concurrently. This allowed us to focus on writing the code without needing to specify parallel waits, locks, or how to launch each individual step in the program's data flow.
+
+We used the aforementioned technology stack to reframe the problem from sequential operations to find a single critical point, into finding an arbitrary number of critical points in parallel. The strategy used for this process was as follows:
+
+1. Derive the mathematical expressions used in the algorithm from both literature and the ext94 source code. In particular, working from the innermost nested loops towards the outermost loops allowed us to identify vector inner products, Hadamard products, matrix multiplications, transposes, inverses, and possible function mappings over the data structures.
+2. By adding another dimension to the identified data structures (creating matrices from n vectors, and 3D tensors from n matrices), we created the necessary data structures in order to allow the identified expressions to work for n points concurrently. This "naive" parallelization was possible because there are no operational or temporal dependencies between the processes of finding the critical points derived from different initial states.
+3. For any calculations that do not use straightforward operations such as sums or multiplications, we created kernelized Julia functions. These can take subsets of input data along with any other inputs in order to replicate complex behavior like masking values or creating mappings.
+
+[^6]: https://www.chemistry.mcmaster.ca/aimpac/imagemap/imagemap.htm
+[^7]: https://github.com/JuliaGPU/KernelAbstractions.jl
+
+
+
+
+
 
 # References
