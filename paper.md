@@ -26,7 +26,7 @@ affiliations:
    index: 1
  - name: Instituto de Química, Universidad Nacional Autónoma de México, Circuito Exterior, C. U., Coyoacán, 04510, Ciudad de México, México.
    index: 2
-date: 5 November 2022
+date: 20 November 2022
 bibliography: paper.bib
 
 ---
@@ -113,7 +113,7 @@ More specifically, one must determine the QTAIM-basins prior to perform the inte
 
 # High Performance and Expresiveness for Numerical Computations
 
-In a short period of time, the Julia programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: its ease of use as a dynamic language with powerful features that make it very productive for writing code, and its fast execution speed, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support parallel compututing and NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in index notation.
+In a short period of time, the Julia programming language [@bezanson2012] has positioned itself as one of the most promising programming languages for scientific and high-performance computing. Among its most innovative features we can highlight: its ease of use as a dynamic language with powerful features that make it very productive for writing code, and its fast execution speed, at least as fast as code written in statically typed [@sengupta2019].  The use of this programming language in the area of numerical computation has increased in recent years as well as various applications exploiting parallel computation [@huo2020, @suslov2020, @huo2021] and has been tested in high-performance architectures [@hunold2020, @weichen2021]. Moreover several Julia packages support parallel computing and NVIDIA GPU's programming as CUDA.jl [@besard2017], KernelAbstractions.jl[^3] that allows to write GPU-like kernels targetting different execution backends and Tullio.jl[^4] to perform array operations written in Einstein index notation.
 
 [^3]: https://github.com/JuliaGPU/KernelAbstractions.jl
 [^4]: https://github.com/mcabbott/Tullio.jl
@@ -128,23 +128,13 @@ Here we present `Extreme.jl`, a highly-performant Julia package developed with t
 
 There are other analysis tools baked into the package such as functions for finding the electron density and its laplacian for any given points in 3D space.
 
-# Single critical point finding benchmarks
-
-Benchmarks were performed on a PC with an i7-5820k and an Nvidia GTX 1080 GPU. For `Extreme.jl`, running times were measured as the average of 3 runs using BenchmarkTools.jl[^5], while ext94 running times were measured using GNU time. For the tests, Julia version 1.6.3 was used, and all runs were measured after an initial first run. This first run is usually far slower due to Julia's JIT compiler.
-
-Each test was performed over a different WFX file, containing the topological information associated with a different molecule. These were selected based on an increasing number of atoms, electrons, and desired critical points.
-
-[TABLE HERE]
-
-[^5]: https://github.com/JuliaCI/BenchmarkTools.jl
-
 # Parallelizing Quantum Chemical Topolical Analysis
 
-`Extreme.jl` was created by reverse engineering the ext94 (extreme) tool of the AIMPAC suite of software applications[^6]. In particular, we explored the source code for its critical-point finding routine. In its original form, the algorithm uses a Newton-Raphson optimization routine over the electron density space for a single point. This involves the usage of nested loop structures which correspond to inner products of vectors and matrix multiplications. The parallelization of these routines is well-known and handled by any given BLAS library, and we decided to use Tullio.jl because of its many advantages:
+`Extreme.jl` was created by reverse engineering the ext94 (extreme) tool of the AIMPAC suite of software applications[^5]. In particular, we explored the source code for its critical-point finding routine. In its original form, the algorithm uses a Newton-Raphson optimization routine over the electron density space for a single point. This involves the usage of nested loop structures which correspond to inner products of vectors and matrix multiplications. The parallelization of these routines is well-known and handled by any given BLAS library, and we decided to use Tullio.jl because of its many advantages:
 
 - It allows for the usage of Einstein notation in order to define multidimensional structures. This gives the code expressiveness, brevity, and an implementation that is remarkably close to the pure mathematical form of the underlying equations.
-- Tullio.jl builds upon the KernelAbstractions.jl[^7] package, which allows for a transparent translation of higher-level expressions into the underlying operations of multiple different compute architectures. This allowed us to use the same source code in order to generate parallel CPU or GPU bound operations.
-- Through KernelAbstractions.jl, it supports mapping arbitrary Julia functions over subsets of a multidimensional data structure. With this, we can create complex functionality for any of the supported architectures. Crucially, it allows us to replace writing CUDA kernels for GPU processing.
+- Tullio.jl builds upon the KernelAbstractions.jl[^6] package, which allows for a transparent translation of higher-level expressions into the underlying operations of multiple different compute architectures. This allowed us to use the same source code in order to generate parallel CPU or GPU bound operations.
+- Through KernelAbstractions.jl, it supports mapping arbitrary Julia functions over subsets of a multidimensional data structure. With this, we can create complex functionality for any of the supported architectures. Crucially, it allows us to forgo writing CUDA kernels for GPU processing.
 - KernelAbstractions.jl handles parsing expressions, ordering and subdividing computations, and executing operations concurrently. This allowed us to focus on writing the code without needing to specify parallel waits, locks, or how to launch each individual step in the program's data flow.
 
 We used the aforementioned technology stack to reframe the problem from sequential operations to find a single critical point, into finding an arbitrary number of critical points in parallel. The strategy used for this process was as follows:
@@ -153,12 +143,54 @@ We used the aforementioned technology stack to reframe the problem from sequenti
 2. By adding another dimension to the identified data structures (creating matrices from n vectors, and 3D tensors from n matrices), we created the necessary data structures in order to allow the identified expressions to work for n points concurrently. This "naive" parallelization was possible because there are no operational or temporal dependencies between the processes of finding the critical points derived from different initial states.
 3. For any calculations that do not use straightforward operations such as sums or multiplications, we created kernelized Julia functions. These can take subsets of input data along with any other inputs in order to replicate complex behavior like masking values or creating mappings.
 
-[^6]: https://www.chemistry.mcmaster.ca/aimpac/imagemap/imagemap.htm
-[^7]: https://github.com/JuliaGPU/KernelAbstractions.jl
+[^5]: https://www.chemistry.mcmaster.ca/aimpac/imagemap/imagemap.htm
+[^6]: https://github.com/JuliaGPU/KernelAbstractions.jl
 
+# Critical point finding benchmarks
 
+Benchmarks were performed on a PC with an i7-5820k processor and an Nvidia GTX 1080 GPU, running CUDA toolkit 11.4.1, and NVIDIA driver 470.63.1. For `Extreme.jl`, running times were measured as the average of 10 runs using BenchmarkTools.jl[^7], while ext94 running times were measured using the multitime[^8] utility, averaging the execution times of 10 different runs. Compilation for ext94 was done on ifort 2021.7.1 20221019, and in the case of `Extreme.jl` Julia version 1.6.3 was used. It is important to note that all of the presented runs were measured after an initial warm-up run in order to remove the effect of Julia's JIT compiler. All measured times can therefore be considered the real-world execution time of each compiled program.
 
+Each test was performed over a different WFN file, containing the topological information associated with a different molecule. These were selected based on an increasing number of atoms, electrons, and desired critical points. The tests were designed so that each program would find the same number of critical points.
 
+An important factor to note is that because point search initialization utilities are not yet implemented in `Extreme.jl`, a random initialization was used for the search. On the other hand, preimplemented initializations are used in ext94. While this affects the critical points found, the execution time is invariant in `Extreme.jl`. This is because any given starting point will be iterated over the same amount of times using the same operations. In this case, the default number of iterations (15) was used.
 
+| Name   | No. Atoms | No. electrons | No. Crit points | Execution Time ext94 | File Load Time Extreme.jl (CPU) | Calculation Time Extreme.jl (CPU) | Speedup Extreme.jl (CPU) vs ext94 | File Load Time Extreme.jl (GPU) | Calculation Time Extreme.jl (GPU) | Speedup Extreme.jl (GPU) vs ext94 |
+|--------|-----------|---------------|-----------------|:--------------------:|:-------------------------------:|:---------------------------------:|-------------------------------------|:-------------------------------:|:---------------------------------:|-------------------------------------|
+| h2o    | 3         | 10            | 5               | 0.066 [s]            | 0.476 [ms]                      | 0.0021 [s]                        | 25.62x                              | 0.528 [ms]                      | 0.0435 [s]                        | 1.5x                                |
+| c2h6   | 8         | 18            | 15              | 0.297 [s]            | 1.669 [ms]                      | 0.0043 [s]                        | 49.76x                              | 1.726 [ms]                      | 0.0413 [s]                        | 6.9x                                |
+| h2o2   | 4         | 18            | 7               | 0.115 [s]            | 1.298 [ms]                      | 0.0028 [s]                        | 28.06x                              | 1.358 [ms]                      | 0.0416 [s]                        | 2.68x                               |
+| thf    | 13        | 40            | 27              | 1.261 [s]            | 7.089 [ms]                      | 0.0125 [s]                        | 64.37x                              | 7.213 [ms]                      | 0.0397 [s]                        | 26.88x                              |
+| bz     | 12        | 42            | 25              | 1.256 [s]            | 8.286 [ms]                      | 0.0109 [s]                        | 65.46x                              | 8.361 [ms]                      | 0.0409 [s]                        | 25.5x                               |
+| cys    | 14        | 64            | 29              | 2.345 [s]            | 15.071 [ms]                     | 0.0198 [s]                        | 67.25x                              | 15.1 [ms]                       | 0.0342 [s]                        | 47.57x                              |
+| ade    | 15        | 70            | 33              | 3.275 [s]            | 20.928 [ms]                     | 0.0262 [s]                        | 69.49x                              | 21.019 [ms]                     | 0.0337 [s]                        | 59.85x                              |
+| tih2o6 | 19        | 80            | 37              | 6.057 [s]            | 24.049 [ms]                     | 0.0288 [s]                        | 114.61x                             | 23.468 [ms]                     | 0.0373 [s]                        | 99.67x                              |
+| phen   | 22        | 94            | 49              | 14.415 [s]           | 39.274 [ms]                     | 0.0492 [s]                        | 162.93x                             | 38.217 [ms]                     | 0.0367 [s]                        | 192.41x                             |
 
-# References
+Table 1 shows the comparison of execution times between ext94 and `Extreme.jl`, displaying both CPU and GPU run times. In order to control for file-loading overhead, `Extreme.jl` measured times are divided between File Load Time and Calculation Time. Our results show a decrease in execution time of several orders of magnitude when compared to the ext94 implementation. [When comparing the execution times of `Extreme.jl` in CPU and GPU, it can be noted that the GPU implementation shows a semi-constant execution time, which is - in general - higher than the CPU implementation, which grows as the topological complexity and number of critical points to search increase]. We believe this to be due caused by the overheads inherent to the CUDA architecture, such as kernel launch times and CPU-GPU communication latency.
+
+In order to compare the exection time for each of the supported architectures in `Extreme.jl` as problem complexity grows, Table 2 shows the search of $n$ critical points over the topological space of the phen.wfn test file. 
+
+| No. Crit Points | Execution Time Extreme.jl (CPU) | Execution Time Extreme.jl (GPU) | GPU speedup vs CPU |
+|-----------------|---------------------------------|---------------------------------|----------------------|
+| 50              | 0.045 [s]                       | 0.037 [s]                       | 1.21x                |
+| 100             | 0.105 [s]                       | 0.037 [s]                       | 2.83x                |
+| 500             | 0.469 [s]                       | 0.057 [s]                       | 8.22x                |
+| 1,000           | 0.870 [s]                       | 0.093 [s]                       | 9.35x                |
+| 5,000           | 6.244 [s]                       | 0.402 [s]                       | 15.53x               |
+| 10,000          | 13.165 [s]                      | 0.806 [s]                       | 16.33x               |
+
+The higher degree of parallelism present in a GPU architecture when compared to CPU processing causes a significant speedup when the problem complexity grows. While searching over thousands of critical points is not a common use case in QCT applications, this synthetic test shows that there is a viable use case for `Extreme.jl` running on different architectures based on the size of the underlying problem.
+
+[^7]: https://github.com/JuliaCI/BenchmarkTools.jl
+[^8]: https://tratt.net/laurie/src/multitime/
+
+# Future development
+
+In its current state, `Extreme.jl` serves as both a starting point and a proof of concept of what is possible when refactoring well-known code used for the field of Quantum Chemical Topology. Some of the next steps in order to broaden its scope and ease of use are the following:
+
+- Implement utilities to propose starting points for the Newton-Raphson search algorithm.
+- Implement algorithms for calculating the stable manifolds of the BCP.
+- Generate an easy-to-use interface that does not require directly interacting with the Julia language.
+- Create more concise code by using automatic code differentiation utilities such as Zygote.jl[^9].
+
+[^9]: https://fluxml.ai/Zygote.jl/latest/
