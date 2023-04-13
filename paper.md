@@ -115,7 +115,7 @@ More specifically, one must determine the QTAIM-basins prior to perform the inte
 
 # High Performance and Expresiveness for Numerical Computations
 
-The Julia programming language [@bezanson2012] has rapidly established itself as a highly promising language for scientific and high-performance computing. Among its most innovative features we can highlight its dynamic nature which, combined with its powerful features, makes it a highly productive language for code development. Additionally, its execution speed is comparable to that of statically typed languages[@sengupta2019]. These factors have led to Julia's increasing adoption in numerical computation and other applications that require parallel computation[@huo2020, @suslov2020, @huo2021], as well as its successful testing on high-performance architectures [@hunold2020, @weichen2021]. Several Julia packages support parallel computing and NVIDIA GPU programming, such as CUDA.jl[@besard2017], KernelAbstractions.jl[^3], and Tullio.jl[@tullio2022], which enables the writing of array operations using Einstein index notation. Overall, these advancements demonstrate the substantial potential of the Julia programming language in the realm of scientific and high-performance computing.
+The Julia programming language [@bezanson2012] has rapidly established itself as a highly promising language for scientific and high-performance computing. Among its most innovative features we can highlight its dynamic nature which, combined with its powerful features, makes it a highly productive language for code development. Additionally, its execution speed is comparable to that of statically typed languages [@sengupta2019]. These factors have led to Julia's increasing adoption in numerical computation and other applications that require parallel computation [@huo2020, @suslov2020, @huo2021], as well as its successful testing on high-performance architectures [@hunold2020, @weichen2021]. Several Julia packages support parallel computing and NVIDIA GPU programming, such as CUDA.jl [@besard2017], KernelAbstractions.jl[^3], and Tullio.jl [@tullio2022], which enables the writing of array operations using Einstein index notation. Overall, these advancements demonstrate the substantial potential of the Julia programming language in the realm of scientific and high-performance computing.
 
 [^3]: https://github.com/JuliaGPU/KernelAbstractions.jl
  
@@ -140,7 +140,7 @@ The development of `Extreme.jl` was initiated through the reverse engineering of
 
 We used the aforementioned technology stack to transform a sequential critical point finding algorithm into a parallelized approach capable of identifying an arbitrary number of critical points. Our methodology proceeded as follows:
 
-1. We derived the relevant mathematical expressions from both the ext94 source code and equations from the Theory of the Atoms in Molecules. By working from the innermost nested loops outward, we identified operations such as vector inner products, Hadamard products, matrix multiplications, transposes, inverses, and function mappings over data structures.
+1. We derived the relevant mathematical expressions from both the ext94 source code and equations from the Theory of Atoms in Molecules. By working from the innermost nested loops outward, we identified operations such as vector inner products, Hadamard products, matrix multiplications, transposes, inverses, and function mappings over data structures.
 2. To enable concurrent processing of n points, we augmented the identified data structures by adding an additional dimension, generating matrices from n vectors and 3D tensors from n matrices. This "naive" parallelization was feasible due to the lack of operational or temporal dependencies between the processes of identifying critical points derived from distinct initial states.
 3. For any calculations that did not involve basic operations such as sums or multiplications, we designed kernelized Julia functions. These functions can accept subsets of input data and other inputs to reproduce complex behavior, such as masking values or generating mappings.
 
@@ -155,7 +155,7 @@ To ensure comprehensive evaluation, we conducted tests using distinct WFN files,
 
 One important point to consider is that `Extreme.jl` currently lacks point search initialization utilities, and hence, a random initialization method was employed for the search process. Conversely, ext94 uses pre-implemented initialization methods. While this could impact the critical points discovered, the execution time of `Extreme.jl` remains unaffected. This is due to the fact that for any given starting point, the algorithm would iterate over the same number of times using the same operations. In the present case, the default number of iterations (15) was used.
 
-| Name           | Atoms | Eelectrons | Critical points | Execution Time ext94 | File Load Time Extreme.jl (CPU) | Calculation Time Extreme.jl (CPU) |
+| Name           | Atoms | Electrons | Critical points | Execution Time ext94 | File Load Time Extreme.jl (CPU) | Calculation Time Extreme.jl (CPU) |
 |----------------|-----------|---------------|-----------------|:--------------------:|:-------------------------------:|:---------------------------------:|
 | H2O            | 3         | 10            | 5               | 0.066 [s]            | 0.476 [ms]                      | 0.0021 [s]                        |
 | C2H6           | 8         | 18            | 15              | 0.297 [s]            | 1.669 [ms]                      | 0.0043 [s]                        |
@@ -167,7 +167,7 @@ One important point to consider is that `Extreme.jl` currently lacks point searc
 | Ti(H2O)6       | 19        | 80            | 37              | 6.057 [s]            | 24.049 [ms]                     | 0.0288 [s]                        |
 | Phenanthroline | 22        | 94            | 49              | 14.415 [s]           | 39.274 [ms]                     | 0.0492 [s]                        |
 
-| Name           | Atoms | Eelectrons | Critical points | Execution Time ext94 | File Load Time Extreme.jl (GPU) | Calculation Time Extreme.jl (GPU) |
+| Name           | Atoms | Electrons | Critical points | Execution Time ext94 | File Load Time Extreme.jl (GPU) | Calculation Time Extreme.jl (GPU) |
 |----------------|-----------|---------------|-----------------|:--------------------:|:-------------------------------:|:---------------------------------:|
 | H2O            | 3         | 10            | 5               | 0.066 [s]            | 0.528 [ms]                      | 0.0435 [s]                        |
 | C2H6           | 8         | 18            | 15              | 0.297 [s]            | 1.726 [ms]                      | 0.0413 [s]                        |
@@ -183,7 +183,7 @@ Table 1 summarizes the results of the test cases comparing the execution times o
 
 To assess the performance of `Extreme.jl` on different compute architectures as the problem complexity increases, Table 3 displays the execution time for searching $n$ critical points over the topological space of the phen.wfn (Phenanthroline) test file.
 
-| No. Crit Points | Execution Time Extreme.jl (CPU) | Execution Time Extreme.jl (GPU) | GPU speedup vs CPU |
+| Critical Points | Execution Time Extreme.jl (CPU) | Execution Time Extreme.jl (GPU) | GPU speedup vs CPU |
 |-----------------|---------------------------------|---------------------------------|----------------------|
 | 50              | 0.045 [s]                       | 0.037 [s]                       | 1.21x                |
 | 100             | 0.105 [s]                       | 0.037 [s]                       | 2.83x                |
@@ -204,4 +204,4 @@ The current version of `Extreme.jl` provides a starting point and demonstrates t
 - Developing utilities that suggest starting points for the Newton-Raphson search algorithm.
 - Introducing algorithms for computing the stable manifolds of the BCP.
 - Creating a more user-friendly interface that does not require direct interaction with the Julia language.
-- Using automatic code differentiation tools like Zygote.jl[zygote2019] to produce more concise code.
+- Using automatic code differentiation tools like Zygote.jl [@zygote2019] to produce more concise code.
