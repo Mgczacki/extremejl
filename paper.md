@@ -39,7 +39,7 @@ bibliography: paper.bib
 
 # Statement of Need
 
-To be rewritten...
+Chemical bonding is one of the most fundamental concepts in chemistry. Using quantum theory of atoms in molecules (QTAIM) topology of the electron density is feasible to compute critical points. Numerical exploration of electron density by following the direction of the gradient towards the maximum of the density involves a considerable high computational cost. To speed up computations necessary to locate critical points, certain methods have been designed in parallel; Rodriguez [@rodgz2013] presents an efficient algorithm to obtain all critical points of the electron density, vectorized and parallel version of the algorithm was implemented using message passing interface library; Hernández-Esparza et al. [@herdz2014] propose a Rodriguez’ algorithm modification in order to show how critical points of the electron density are found implemented on GPUs, this algorithm was implemented using C and CUDA programming techniques. Extrem.jl provides a Julia implementation to compute bound critical points (BCP) of an electronic system, it has been parallelized for exploring electronic density efficiently. This package uses CUDA.jl and benefits from Tullio.jl and KernelAbstractions.jl packages 
 
 <!-- Chemical bonding is one of the most fundamental concepts in chemistry.
 The most sound way to examine different sorts of chemical
