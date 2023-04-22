@@ -1,5 +1,5 @@
 ---
-title: 'Extreme.jl: A Julia package for Quantum Chemical Topology 
+title: 'Extreme.jl: A Julia package for Quantum Chemical Topology' 
 tags:
   - Julia
   - Quantum Chemical Topology 
@@ -41,7 +41,7 @@ bibliography: paper.bib
 
 The soundest way to examine different sorts of chemical interactions under the same physical basis is arguably via the examination of quantum mechanical observables and their expectation values. The analysis of the local and integrated values of these Dirac observables has resulted in the emerging of the field of theoretical computational chemistry known as *Quantum Chemical Topology* (QCT). The origins of QCT are based on the *Quantum Theory of Atoms in Molecules* (QTAIM) which provides a division of the three-dimensional space into basins which are related with the atoms of chemistry envisioned by Dalton at the beginning of the XIX century. Several tools of QCT take advantage of the partition of the 3D space defined by QTAIM, e.g., the *Interacting Quantum Atoms* (IQA) energy partition. The IQA partition has been very useful in the investigation of a wide diversity of interactions in chemistry, e.g., covalent, polar, ionic, intermolecular interactions as well as chemical bonding in solid state systems. Despite the recognized utility of the IQA analysis this approach requires the integration of scalar fields over very irregular volume shapes. This endeavor is far from straightforward, and it involves a computational effort which severely hampers the applicability of IQA for the study of electronic systems. Currently, the IQA can only be applied to systems with only a few tens of atoms. Indeed, the main bottleneck for the exploration of the IQA approach is the calculation of the abovementioned integrals. Therefore, new algorithms and software is needed for the amelioration of this situation.
 In order to speed up computations necessary to locate critical points certain methods have been implemented in parallel. @rodgz2013 2013 presents an efficient algorithm to obtain all critical points of the electron density, vectorized and parallel version of the algorithm was implemented using message passing interface library; @herdz2014 propose a Rodriguez’ algorithm modification in order to show how critical points of the electron density are found using GPUs, this algorithm was implemented in C and CUDA programming techniques. 
-Calculation of bound critical points (BCP) requires numerical exploration of electron density by following the direction of the gradient towards the maximum of the density. Extreme.jl provides a Julia implementation to compute bound critical points of an electronic system, it has been parallelized for exploring electronic density efficiently employing GPUs. Extreme.jl uses CUDA.jl and benefits from Tullio.jl and KernelAbstractions.jl packages.
+Calculation of bound critical points (BCP) requires numerical exploration of electron density by following the direction of the gradient towards the maximum of the density. `Extreme.jl provides a Julia implementation to compute bound critical points of an electronic system, it has been parallelized for exploring electronic density efficiently employing GPUs. Extreme.jl uses CUDA.jl and benefits from Tullio.jl and KernelAbstractions.jl packages.
  
 
 <!-- Chemical bonding is one of the most fundamental concepts in chemistry.
@@ -158,7 +158,7 @@ To ensure comprehensive evaluation, we conducted tests using distinct WFN files,
 
 One important point to consider is that `Extreme.jl` currently lacks point search initialization utilities, and hence, a random initialization method was employed for the search process. Conversely, ext94 uses pre-implemented initialization methods. While this could impact the critical points discovered, the execution time of `Extreme.jl` remains unaffected. This is due to the fact that for any given starting point, the algorithm would iterate over the same number of times using the same operations. In the present case, the default number of iterations (15) was used.
 
-| Name           | Atoms | Electrons | Critical points | Execution Time ext94 | File Load Time Extreme.jl (CPU) | Calculation Time Extreme.jl (CPU) |
+| Name           | Atoms | Electrons | Critical points | Execution Time ext94 [s] | File Load Time Extreme.jl (CPU) [ms] | Calculation Time Extreme.jl (CPU) [s] |
 |----------------|-----------|---------------|-----------------|:--------------------:|:-------------------------------:|:---------------------------------:|
 | H2O            | 3         | 10            | 5               | 0.066 [s]            | 0.476 [ms]                      | 0.0021 [s]                        |
 | C2H6           | 8         | 18            | 15              | 0.297 [s]            | 1.669 [ms]                      | 0.0043 [s]                        |
