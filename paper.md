@@ -32,7 +32,7 @@ bibliography: paper.bib
 ---
 
 # Summary
-`Extreme.jl` is a *Quantum Chemical Topology* (QCT) package designed to compute *bound critical points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$.  It uses the Julia programming language[^1] to overcome processing bottlenecks by parallelizing electronic density calculations and finding critical points using the CUDA.jl package[^2]. `Extreme.jl` was created by analyzing algorithms from a legacy QCT package and porting them to Julia, taking advantage of its support for parallelism, GPU compute, and overall extensibility. The package is still in development, and future plans include implementing utilities for proposing starting points, stable manifold calculations, and creating a more user-friendly interface. The package's performance has been compared to the ext94 implementation and shows a significant decrease in execution time, especially when using GPU processing for large problem complexities.
+`Extreme.jl` is a *Quantum Chemical Topology* (QCT) package designed to compute *bound critical points* (BCP) of the electron charge distribution $\varrho(\mathbf{r})$.  It uses the Julia programming language[^1] to overcome processing bottlenecks by parallelizing electronic density calculations and finding critical points using the CUDA.jl package[^2]. `Extreme.jl` was created by analyzing algorithms from a legacy QCT package and porting them to Julia, taking advantage of its support for parallelism, GPU compute, and overall extensibility. The package is still in development, and future plans include implementing utilities for proposing starting points, stable manifold calculations, and creating a more user-friendly interface. The package's performance has been compared to the `ext94` implementation and shows a significant decrease in execution time, especially when using GPU processing for large problem complexities.
 
 [^1]: https://julialang.org
 [^2]: https://github.com/JuliaGPU/CUDA.jl
@@ -118,7 +118,7 @@ More specifically, one must determine the QTAIM-basins prior to perform the inte
 
 # High Performance and Expresiveness for Numerical Computations
 
-The Julia programming language [@bezanson2012] has rapidly established itself as a highly promising language for scientific and high-performance computing. Among its most innovative features we can highlight its dynamic nature which, combined with its powerful features, makes it a highly productive language for code development. Additionally, its execution speed is comparable to that of statically typed languages [@sengupta2019]. These factors have led to Julia's increasing adoption in numerical computation and other applications that require parallel computation [@huo2020; @suslov2020;@huo2021], as well as its successful testing on high-performance architectures [@hunold2020; @weichen2021]. Several Julia packages support parallel computing and NVIDIA GPU programming, such as CUDA.jl [@besard2017], KernelAbstractions.jl[^3], and Tullio.jl [@tullio2022], which enables the writing of array operations using Einstein index notation. Overall, these advancements demonstrate the substantial potential of the Julia programming language in the realm of scientific and high-performance computing.
+The Julia programming language [@bezanson2012] has rapidly established itself as a highly promising language for scientific and high-performance computing. Among its most innovative features we can highlight its dynamic nature which, combined with its powerful features, makes it a highly productive language for code development. Additionally, its execution speed is comparable to that of statically typed languages [@sengupta2019]. These factors have led to Julia's increasing adoption in numerical computation and other applications that require parallel computation [@huo2020; @suslov2020;@huo2021], as well as its successful testing on high-performance architectures [@hunold2020; @weichen2021]. Several Julia packages support parallel computing and NVIDIA GPU programming, such as CUDA.jl [@besard2017], KernelAbstractions.jl[^3], and Tullio.jl [@tullio2022], which enables the writing of array operations using Einstein index notation. Overall, these advancements demonstrate the substantial potential of the Julia programming language in the field of scientific and high-performance computing.
 
 [^3]: https://github.com/JuliaGPU/KernelAbstractions.jl
  
@@ -136,9 +136,9 @@ There are other analysis tools implemented in the package such as functions for 
 
 The development of `Extreme.jl` was initiated through the reverse engineering of the ext94 (extreme) tool of the AIMPAC suite of software applications[^4]. Specifically, we focused on the critical-point finding routine contained within the source code. The original algorithm employs a Newton-Raphson optimization routine over the electron density space for a single point, which necessitates the use of nested loop structures consisting of inner products of vectors and matrix multiplications. The parallelization of these routines is a well-established technique that can be handled by various BLAS libraries. In our case, we opted to use Tullio.jl due to its numerous advantages:
 
-- It facilitates the use of Einstein notation for defining multidimensional structures. This gives the code expressiveness, brevity, and an implementation that is remarkably close to the pure mathematical form of the underlying equations.
-- Tullio.jl is built on the KernelAbstractions.jl[^5] package, which provides a transparent translation of high-level expressions into underlying operations across multiple different compute architectures. This enables seamless generation of parallel CPU or GPU operations from the same source code.
-- Through KernelAbstractions.jl, Tullio.jl supports mapping arbitrary Julia functions over subsets of a multidimensional data structure. This allowed us to create complex functionality for any of the supported architectures. Crucially, it allowed us to forgo writing CUDA kernels for GPU processing.
+- It facilitates the use of Einstein notation for defining multidimensional structures. This notation gives the code expressiveness, brevity, and an implementation that is remarkably close to the pure mathematical form of the underlying equations.
+- Tullio.jl is built on the KernelAbstractions.jl[^5] package, which provides a transparent translation of high-level expressions into underlying operations across multiple different compute architectures. This strategy enables seamless generation of parallel CPU or GPU operations from the same source code.
+- Through KernelAbstractions.jl, Tullio.jl supports mapping arbitrary Julia functions over subsets of a multidimensional data structure wich allowed us to create complex functionality for any of the supported architectures. Hence,  The use of these techniques reduces the complexity in writing CUDA kernels for GPU processing.
 - KernelAbstractions.jl handles the parsing of expressions, ordering and subdividing computations, and concurrent execution of operations, freeing the programmer from specifying parallel waits, locks, or launch procedures for individual program steps.
 
 We used the aforementioned technology stack to transform a sequential critical point finding algorithm into a parallelized approach capable of identifying an arbitrary number of critical points. Our methodology proceeded as follows:
@@ -158,42 +158,42 @@ To ensure comprehensive evaluation, we conducted tests using distinct WFN files,
 
 One important point to consider is that `Extreme.jl` currently lacks point search initialization utilities, and hence, a random initialization method was employed for the search process. Conversely, ext94 uses pre-implemented initialization methods. While this could impact the critical points discovered, the execution time of `Extreme.jl` remains unaffected. This is due to the fact that for any given starting point, the algorithm would iterate over the same number of times using the same operations. In the present case, the default number of iterations (15) was used.
 
-| Name           | Atoms | Electrons | Critical points | Execution Time ext94 [s] | File Load Time Extreme.jl (CPU) [ms] | Calculation Time Extreme.jl (CPU) [s] |
-|----------------|-----------|---------------|-----------------|:--------------------:|:-------------------------------:|:---------------------------------:|
-| H2O            | 3         | 10            | 5               | 0.066 [s]            | 0.476 [ms]                      | 0.0021 [s]                        |
-| C2H6           | 8         | 18            | 15              | 0.297 [s]            | 1.669 [ms]                      | 0.0043 [s]                        |
-| (H2O)24        | 4         | 18            | 7               | 0.115 [s]            | 1.298 [ms]                      | 0.0028 [s]                        |
-| THF            | 13        | 40            | 27              | 1.261 [s]            | 7.089 [ms]                      | 0.0125 [s]                        |
-| C6H6           | 12        | 42            | 25              | 1.256 [s]            | 8.286 [ms]                      | 0.0109 [s]                        |
-| Cysteine       | 14        | 64            | 29              | 2.345 [s]            | 15.071 [ms]                     | 0.0198 [s]                        |
-| Adenine        | 15        | 70            | 33              | 3.275 [s]            | 20.928 [ms]                     | 0.0262 [s]                        |
-| Ti(H2O)6       | 19        | 80            | 37              | 6.057 [s]            | 24.049 [ms]                     | 0.0288 [s]                        |
-| Phenanthroline | 22        | 94            | 49              | 14.415 [s]           | 39.274 [ms]                     | 0.0492 [s]                        |
+| Name           | Atoms | Electrons | Critical<br > points | Execution Time <br > ext94 [s] | File Load Time <br >  Extreme.jl (CPU) [ms] | Calculation Time <br >  Extreme.jl (CPU) [s] |
+|----------------|-----------|---------------|-----------------|:----------------:|:--------------------------:|:----------------------------:|
+| H2O            | 3         | 10            | 5               |  0.066           |  0.476                     | 0.0021                       |
+| C2H6           | 8         | 18            | 15              |  0.297           |  1.669                     | 0.0043                       |
+| (H2O)24        | 4         | 18            | 7               |  0.115           |  1.298                     | 0.0028                       |
+| THF            | 13        | 40            | 27              |  1.261           |  7.089                     | 0.0125                       |
+| C6H6           | 12        | 42            | 25              |  1.256           |  8.286                     | 0.0109                       |
+| Cysteine       | 14        | 64            | 29              |  2.345           | 15.071                     | 0.0198                       |
+| Adenine        | 15        | 70            | 33              |  3.275           | 20.928                     | 0.0262                       |
+| Ti(H2O)6       | 19        | 80            | 37              |  6.057           | 24.049                     | 0.0288                       |
+| Phenanthroline | 22        | 94            | 49              | 14.415           | 39.274                     | 0.0492                       |
 
-| Name           | Atoms | Electrons | Critical points | Execution Time ext94 | File Load Time Extreme.jl (GPU) | Calculation Time Extreme.jl (GPU) |
-|----------------|-----------|---------------|-----------------|:--------------------:|:-------------------------------:|:---------------------------------:|
-| H2O            | 3         | 10            | 5               | 0.066 [s]            | 0.528 [ms]                      | 0.0435 [s]                        |
-| C2H6           | 8         | 18            | 15              | 0.297 [s]            | 1.726 [ms]                      | 0.0413 [s]                        |
-| (H2O)24        | 4         | 18            | 7               | 0.115 [s]            | 1.358 [ms]                      | 0.0416 [s]                        |
-| THF            | 13        | 40            | 27              | 1.261 [s]            | 7.213 [ms]                      | 0.0397 [s]                        |
-| C6H6           | 12        | 42            | 25              | 1.256 [s]            | 8.361 [ms]                      | 0.0409 [s]                        |
-| Cysteine       | 14        | 64            | 29              | 2.345 [s]            | 15.1 [ms]                       | 0.0342 [s]                        |
-| Adenine        | 15        | 70            | 33              | 3.275 [s]            | 21.019 [ms]                     | 0.0337 [s]                        |
-| Ti(H2O)6       | 19        | 80            | 37              | 6.057 [s]            | 23.468 [ms]                     | 0.0373 [s]                        |
-| Phenanthroline | 22        | 94            | 49              | 14.415 [s]           | 38.217 [ms]                     | 0.0367 [s]                        |
+| Name           | Atoms | Electrons | Critical<br > points | Execution Time<br > ext94 [s] | File Load Time<br > Extreme.jl (GPU) [ms] | Calculation Time <br >  Extreme.jl (GPU) [s] |
+|----------------|-----------|---------------|-----------------|:-----------------:|:--------------------------:|:---------------------------:|
+| H2O            | 3         | 10            | 5               |  0.066            | 0.528                      | 0.0435                      |
+| C2H6           | 8         | 18            | 15              |  0.297            | 1.726                      | 0.0413                      |
+| (H2O)24        | 4         | 18            | 7               |  0.115            | 1.358                      | 0.0416                      |
+| THF            | 13        | 40            | 27              |  1.261            | 7.213                      | 0.0397                      |
+| C6H6           | 12        | 42            | 25              |  1.256            | 8.361                      | 0.0409                      |
+| Cysteine       | 14        | 64            | 29              |  2.345            | 15.1                       | 0.0342                      |
+| Adenine        | 15        | 70            | 33              |  3.275            | 21.019                     | 0.0337                      |
+| Ti(H2O)6       | 19        | 80            | 37              |  6.057            | 23.468                     | 0.0373                      |
+| Phenanthroline | 22        | 94            | 49              | 14.415            | 38.217                     | 0.0367                      |
 
 Table 1 summarizes the results of the test cases comparing the execution times of ext94 and `Extreme.jl` on CPU. In Table 2, the same comparison is made for GPU execution. To account for file-loading overhead, `Extreme.jl` measured times are divided into File Load Time and Calculation Time. The results indicate a significant decrease in execution time, by several orders of magnitude, for `Extreme.jl` compared to ext94. However, when comparing the execution times of `Extreme.jl` on CPU and GPU, it can be observed that the GPU implementation exhibits a semi-constant execution time, which is generally higher than the CPU implementation. This could be due to the overheads inherent to the CUDA architecture, such as kernel launch times and CPU-GPU communication latency.
 
 To assess the performance of `Extreme.jl` on different compute architectures as the problem complexity increases, Table 3 displays the execution time for searching $n$ critical points over the topological space of the phen.wfn (Phenanthroline) test file.
 
-| Critical Points | Execution Time Extreme.jl (CPU) | Execution Time Extreme.jl (GPU) | GPU speedup vs CPU |
-|-----------------|---------------------------------|---------------------------------|----------------------|
-| 50              | 0.045 [s]                       | 0.037 [s]                       | 1.21x                |
-| 100             | 0.105 [s]                       | 0.037 [s]                       | 2.83x                |
-| 500             | 0.469 [s]                       | 0.057 [s]                       | 8.22x                |
-| 1,000           | 0.870 [s]                       | 0.093 [s]                       | 9.35x                |
-| 5,000           | 6.244 [s]                       | 0.402 [s]                       | 15.53x               |
-| 10,000          | 13.165 [s]                      | 0.806 [s]                       | 16.33x               |
+| Critical<br > Points | Execution Time<br >  Extreme.jl (CPU) [s] | Execution Time <br > Extreme.jl (GPU) [s] | GPU speedup vs CPU |
+|-----------------|:----------------------------:|:---------------------------:|:--------------------:|
+| 50              |  0.045                       | 0.037                       |  1.21x               |
+| 100             |  0.105                       | 0.037                       |  2.83x               |
+| 500             |  0.469                       | 0.057                       |  8.22x               |
+| 1,000           |  0.870                       | 0.093                       |  9.35x               |
+| 5,000           |  6.244                       | 0.402                       | 15.53x               |
+| 10,000          | 13.165                       | 0.806                       | 16.33x               |
 
 The greater parallelism available in a GPU architecture provides a substantial speed boost as the complexity of the problem increases. Although it may not be typical to search for thousands of critical points in QCT applications, it is not an unrealistic scenario. The results of our synthetic test demonstrate that `Extreme.jl` can be used effectively on different architectures depending on the scale of the underlying problem.
 
